@@ -1,0 +1,6 @@
+authentication/node_modules
+authentication/.env
+authentication/.eslintrc.json
+drive/node_modules
+drive/.env
+drive/.eslintrc.json
