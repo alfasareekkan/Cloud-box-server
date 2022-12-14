@@ -4,7 +4,9 @@ import User, { IUser } from "../model/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { ProcessEnv } from "../index";
+import { ProcessEnv,ch } from "../index";
+
+
 dotenv.config();
 
 const JWTKEY: string | undefined = process.env.JWTKEY;
@@ -52,6 +54,7 @@ const createToken = (result:IUser) => {
   }
 };
 interface resultType extends IUser {
+  [x: string]: any;
   _id: ObjectId;
 }
 
@@ -72,7 +75,8 @@ export const signUpPost = async (req: Request, res: Response) => {
       email,
       password: hashedPwd,
     });
-
+    const user=await result.save()
+    ch.sendToQueue('user_created',Buffer.from(JSON.stringify(user)))
     const token = createToken(result);
 
     res.status(201).json({ user: result, accessToken:token });

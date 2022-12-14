@@ -17,6 +17,7 @@
     "@types/jsonwebtoken": "^8.5.9",
     "@types/mongoose": "^5.11.97",
     "@types/validator": "^13.7.10",
+    "amqplib": "^0.10.3",
     "bcrypt": "^5.1.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
@@ -28,6 +29,7 @@
     "validator": "^13.7.0"
   },
   "devDependencies": {
+    "@types/amqplib": "^0.10.0",
     "@typescript-eslint/eslint-plugin": "^5.45.0",
     "@typescript-eslint/parser": "^5.45.0",
     "eslint": "^8.29.0",
