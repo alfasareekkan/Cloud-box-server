@@ -4,7 +4,7 @@ import User, { IUser } from "../model/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { ProcessEnv,ch } from "../index";
+import { producer } from "../index";
 
 
 dotenv.config();
@@ -75,8 +75,13 @@ export const signUpPost = async (req: Request, res: Response) => {
       email,
       password: hashedPwd,
     });
-    const user=await result.save()
-    ch.sendToQueue('user_created',Buffer.from(JSON.stringify(user)))
+    const user = await result.save()
+    const msg = {
+      action: 'REGISTER',
+      data:user
+    }
+    // ch.sendToQueue('user_created',Buffer.from(JSON.stringify(user)))
+    producer(JSON.stringify(msg))
     const token = createToken(result);
 
     res.status(201).json({ user: result, accessToken:token });
