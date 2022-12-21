@@ -1,14 +1,15 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { model, Schema, Types } from "mongoose";
 
-interface Folder{
+export interface IFolder{
     folderName: string;
-    parentFolderId: Types.ObjectId | undefined;
+    parentFolderId?: Types.ObjectId;
     userId: Types.ObjectId;
-    recordStatus: Number,
+    recordStatus: number,
+    folderLevel:number
     
 }
 
-const folderSchema = new Schema<Folder>({
+const folderSchema = new Schema<IFolder>({
     folderName: {
         type: String,
         required: true,
@@ -17,13 +18,19 @@ const folderSchema = new Schema<Folder>({
         type: Schema.Types.ObjectId,
     },
     userId: {
-        type: Schema.Types.ObjectId,
-        required:true,
+        type: Schema.Types.ObjectId
+       
     },
     recordStatus: {
         type: Number,
         default: 0,
         required:true
+    },
+    folderLevel: {
+        type:Number,
     }
 
-},{timestamps:true})
+}, { timestamps: true })
+
+const Folder = model<IFolder>('Folder', folderSchema)
+export default Folder

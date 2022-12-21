@@ -12,11 +12,11 @@ export const consumer = createMQConsumer(
   process.env.RABITQUEUE
 );
 const app = express();
+app.use(cors({ credentials: true, origin: "http://127.0.0.1:5173" }));  
 app.use(express.json());
 
 const port = process.env.PORT;
-app.use(cors());
-app.use("/", folderRouter);
+app.use('/', folderRouter);
 consumer();
 mongoose.connect(process.env.DATABASE).then(() => {
   app.listen(port, () => {

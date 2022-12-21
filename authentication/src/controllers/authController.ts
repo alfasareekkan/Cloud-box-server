@@ -94,9 +94,13 @@ export const signUpPost = async (req: Request, res: Response) => {
 
 export const loginPost = async (req: Request, res: Response) => {
   // console.log(req.body,"login ");
-  const cookies =  req.cookies;
-  console.log(cookies);
+  const cookies = req.cookies;
+  const headers=req.headers
+  
+  console.log(headers);
   const { user, pwd } = req.body;
+  console.log(req.body);
+  
     if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
 
     const foundUser = await User.findOne({ email: user }).exec();
