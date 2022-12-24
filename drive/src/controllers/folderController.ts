@@ -63,16 +63,22 @@ export const isGetFolder = async (req: Request, res: Response) => {
 };
 
 export const getAllFolders = async(req: Request, res: Response) => {
-    const { user, level, folderId } = req.body
+  const { user, level, folderId } = req.body
+  console.log(folderId);
+  
     try {
         let userId=jwtDecode(user)
-        if (!folderId &&level===1) {
+      if (!folderId && level === 1) {
+          console.log("😒🐉🐉");
+          
             let folders = await Folder.find({ userId: userId,folderLevel:1 })
             res.status(200).json(folders)
             
         }
-        else if (folderId && level != 1) {
-            let folders = await Folder.find({ userId: userId, _id: folderId })
+      else if (folderId && level !== 1) {
+        console.log('💕💕');
+        
+            let folders = await Folder.find({ userId: userId, parentFolderId: folderId })
             console.log(folders);
             
             res.status(200).json(folders)
