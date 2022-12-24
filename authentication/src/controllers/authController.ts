@@ -39,7 +39,7 @@ const handleErrors = (err: any) => {
   return error;
 };
 
-const createToken = (result:IUser) => {
+export const createToken = (result:IUser) => {
   if (JWTKEY) {
     return jwt.sign(
       {
