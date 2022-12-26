@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
 import { decode, JwtPayload } from "jsonwebtoken"
-import {hash} from "bcrypt"
+import {hash,compare} from "bcrypt"
 import User from "../model/User";
-import { createToken } from "./authController";
+import { createToken,handleErrors } from "./authController";
 
 
 const jwtDecode = (token: string):JwtPayload=> {
@@ -22,11 +22,11 @@ export const googleSignUp = async (req: Request, res: Response) => {
         const payload = jwtDecode(req.body.credentials)
     const password = payload.email + process.env.REFRESH_TOKEN_SECRET
     
-        const hashPassword =await hash(password,20)
-        
-
+    
+    
     const user = await User.findOne({ email: payload.email })
     if (!user) {
+        const hashPassword =await hash(password,20)
         const result=await User.create({
             email: payload.email,
             firstName: payload.given_name,
@@ -39,10 +39,23 @@ export const googleSignUp = async (req: Request, res: Response) => {
         console.log(token,"😒😒");
         
         res.status(201).json({ user: result, accessToken:token });
-    }
+        }
+        if (user) {
+            const match = compare(password, user.password)
+            if (match) {
+                const token = createToken(user)
+             console.log(token);
+                
+                res.status(201).json({ user:user, accessToken:token})
+            } else {
+                res.status(401)
+            }
+        }
     } catch (error) {
         console.log(error);
         
+        const err = handleErrors(error)
+        res.status(401).json({err})
     }
     
     

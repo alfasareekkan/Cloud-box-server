@@ -17,12 +17,12 @@ export interface ProcessEnv {
         app.use(express.json());
 app.use(cors({
   credentials: true,
-  origin: "http://localhost:5174"
+  origin: process.env.ORIGIN
 }));
         
         
         app.use("/", authRoute);
-        app.use("/refresh", refresh);
+        // app.use("/refresh", refresh);
       mongoose.connect(process.env.DATABASE).then(() => {
           app.listen(4000, () => {
             console.log('listening on port 4000');

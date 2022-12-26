@@ -11,11 +11,12 @@ dotenv.config();
 
 const JWTKEY: string | undefined = process.env.JWTKEY;
 
-const handleErrors = (err: any) => {
+export const handleErrors = (err: any) => {
   console.log(err.message);
   // err.code is for duplicate exists
   interface errorType {
-    email:string,password:string
+    email: string, password: string,
+    [key: string]: any
   }
   const error : errorType = { email: "", password: "", };
   if (err.code === 11000) {
@@ -25,16 +26,16 @@ const handleErrors = (err: any) => {
   if (err.message.includes("User validation failed")) {
     // to take values only form object
     Object.values(err.errors).forEach(({ properties }: any) => {
-      console.log(err.errors);
+      console.log(properties,'😒😒');
       
-      // error[properties.path]= properties.message;
+      error[properties.path]= properties.message;
     });
   }
   if (err.message === "incorrect email") {
-    error.email = "that email not registered";
+    error.email = "incorrect email";
   }
   if (err.message === "incorrect password") {
-    error.password = "that password is incorrect";
+    error.password = "incorrect password";
   }
   return error;
 };
@@ -49,10 +50,22 @@ export const createToken = (result:IUser) => {
         },
       },
       JWTKEY,
-      { expiresIn: "10s" }
+      { expiresIn: "15s" }
     );
   }
 };
+export const refreshToken = (result:IUser) => {
+  return jwt.sign(
+    {
+      UserInfo: {
+        username: result.email,
+        id: result._id,
+      },
+    },
+    JWTKEY,
+    { expiresIn: "7d" }
+  );
+}
 interface resultType extends IUser {
   [x: string]: any;
   _id: ObjectId;
@@ -60,12 +73,11 @@ interface resultType extends IUser {
 
 export const signUpPost = async (req: Request, res: Response) => {
   const { firstName, lastName, email, password }: IUser = req.body;
-    if (!email || !password)
+  if (!email || !password)
     return res
       .status(400)
       .json({ message: "Username and password are required." });
-  const duplicate = await User.findOne({ email: email }).exec();
-  if (duplicate) return res.sendStatus(409);
+  
   try {
     //encrypt the password
     const hashedPwd = await bcrypt.hash(password, 10);
@@ -88,85 +100,98 @@ export const signUpPost = async (req: Request, res: Response) => {
   } catch (err: any) {
     const errors = handleErrors(err);
 
-    res.status(500).json({ errors});
+    res.status(400).json({ errors});
   }
 };
 
 export const loginPost = async (req: Request, res: Response) => {
-  // console.log(req.body,"login ");
-  const cookies = req.cookies;
-  const headers=req.headers
-  
-  console.log(headers);
-  const { user, pwd } = req.body;
-  console.log(req.body);
-  
-    if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
-
-    const foundUser = await User.findOne({ email: user }).exec();
-    if (!foundUser) return res.sendStatus(401); //Unauthorized 
-    // evaluate password 
-    const match = await bcrypt.compare(pwd, foundUser.password);
-  if (match) {
-    let newRefreshToken=''
-    let accessToken
-
-        // create JWTs
-      if (JWTKEY) {
-        accessToken = jwt.sign(
-          {
-              UserInfo: {
-                  username: foundUser.email,
-                    id: foundUser._id,
-                  
-              }
-          },
-          JWTKEY,
-          { expiresIn: '10s' }
-        );
-         newRefreshToken = jwt.sign(
-          { "username": foundUser.email },
-          JWTKEY,
-          { expiresIn: '15s' }
-      );
-      }
-
-     const  UserRefreshToken:string[] | undefined= foundUser?.refreshToken
+  const { email, password } = req.body;
+  try {
+    const user =await User.login(email, password)
       
-      let newRefreshTokenArray: string[]| undefined =
-            !cookies?.jwt
-                ? foundUser?.refreshToken
-          : UserRefreshToken?.filter(rt => rt !== cookies.jwt); 
-           // eslint-disable-next-line no-var
-           var tokenStatus=true
-        if (cookies?.jwt) {
-
-            const refreshToken = cookies.jwt;
-            const foundToken = await User.findOne({ refreshToken }).exec();
-
-            // Detected refresh token reuse!
-            if (!foundToken) {
-                // clear out ALL previous refresh tokens
-                newRefreshTokenArray = [] ;
-            }
-            tokenStatus=false
-            // res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
-        }
-        
-      if (newRefreshTokenArray) {
-        foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
-      }
-      const result = await foundUser.save();
-    if (typeof newRefreshToken==='string') {
-      res.json({ accessToken ,newRefreshToken,user:foundUser.email,tokenStatus});
-     }
-
-        
-
-  } else {
-        res.sendStatus(401);
-      }
+    const token = createToken(user);
+    const refresh = refreshToken(user)
+      res.status(200).json({user,accessToken:token,refreshToken:refresh})
+  } catch (error) {
+    const errors = handleErrors(error);
+    
+    res.status(400).json({ errors });
   }
+ }
+  // console.log(req.body,"login ");
+//   const cookies = req.cookies;
+//   const headers=req.headers
+  
+//   console.log(headers);
+//   const { user, pwd } = req.body;
+//   console.log(req.body);
+  
+//     if (!user || !pwd) return res.status(400).json({ 'message': 'Username and password are required.' });
+
+//     const foundUser = await User.findOne({ email: user }).exec();
+//     if (!foundUser) return res.sendStatus(401); //Unauthorized 
+//     // evaluate password 
+//     const match = await bcrypt.compare(pwd, foundUser.password);
+//   if (match) {
+//     let newRefreshToken=''
+//     let accessToken
+
+//         // create JWTs
+//       if (JWTKEY) {
+//         accessToken = jwt.sign(
+//           {
+//               UserInfo: {
+//                   username: foundUser.email,
+//                     id: foundUser._id,
+                  
+//               }
+//           },
+//           JWTKEY,
+//           { expiresIn: '10s' }
+//         );
+//          newRefreshToken = jwt.sign(
+//           { "username": foundUser.email },
+//           JWTKEY,
+//           { expiresIn: '15s' }
+//       );
+//       }
+
+//      const  UserRefreshToken:string[] | undefined= foundUser?.refreshToken
+      
+//       let newRefreshTokenArray: string[]| undefined =
+//             !cookies?.jwt
+//                 ? foundUser?.refreshToken
+//           : UserRefreshToken?.filter(rt => rt !== cookies.jwt); 
+//            // eslint-disable-next-line no-var
+//            var tokenStatus=true
+//         if (cookies?.jwt) {
+
+//             const refreshToken = cookies.jwt;
+//             const foundToken = await User.findOne({ refreshToken }).exec();
+
+//             // Detected refresh token reuse!
+//             if (!foundToken) {
+//                 // clear out ALL previous refresh tokens
+//                 newRefreshTokenArray = [] ;
+//             }
+//             tokenStatus=false
+//             // res.clearCookie('jwt', { httpOnly: true, sameSite: 'none', secure: true });
+//         }
+        
+//       if (newRefreshTokenArray) {
+//         foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
+//       }
+//       const result = await foundUser.save();
+//     if (typeof newRefreshToken==='string') {
+//       res.json({ accessToken ,newRefreshToken,user:foundUser.email,tokenStatus});
+//      }
+
+        
+
+//   } else {
+//         res.sendStatus(401);
+//       }
+//   }
 
   
-;
+// ;

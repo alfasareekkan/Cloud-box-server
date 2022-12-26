@@ -9,7 +9,6 @@ export interface IUser {
     lastName: string;
     email: string;
     password: string;
-    refreshToken?: string[] | undefined;
     profile?:string
     // phoneNumber: number;
 }
@@ -39,7 +38,6 @@ const userSchema = new Schema<IUser,UserModel>({
         required: [true,"Please enter password"],
         minlength:[6,'Minimum password length is 6 characters']
     },
-    refreshToken: [String],
     profile: {
         type:String
     }
