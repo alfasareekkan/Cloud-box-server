@@ -40,7 +40,7 @@ export const handleErrors = (err: any) => {
   return error;
 };
 
-export const createToken = (result:IUser) => {
+export const createToken = (result:IUser,time:string) => {
   if (JWTKEY) {
     return jwt.sign(
       {
@@ -50,22 +50,10 @@ export const createToken = (result:IUser) => {
         },
       },
       JWTKEY,
-      { expiresIn: "15s" }
+      { expiresIn: time }
     );
   }
 };
-export const refreshToken = (result:IUser) => {
-  return jwt.sign(
-    {
-      UserInfo: {
-        username: result.email,
-        id: result._id,
-      },
-    },
-    JWTKEY,
-    { expiresIn: "7d" }
-  );
-}
 interface resultType extends IUser {
   [x: string]: any;
   _id: ObjectId;
@@ -94,7 +82,7 @@ export const signUpPost = async (req: Request, res: Response) => {
     }
     // ch.sendToQueue('user_created',Buffer.from(JSON.stringify(user)))
     producer(JSON.stringify(msg))
-    const token = createToken(result);
+    const token = createToken(result,'15s');
 
     res.status(201).json({ user: result, accessToken:token });
   } catch (err: any) {
@@ -109,8 +97,8 @@ export const loginPost = async (req: Request, res: Response) => {
   try {
     const user =await User.login(email, password)
       
-    const token = createToken(user);
-    const refresh = refreshToken(user)
+    const token = createToken(user,'7d');
+    const refresh = createToken(user,'15s');
       res.status(200).json({user,accessToken:token,refreshToken:refresh})
   } catch (error) {
     const errors = handleErrors(error);

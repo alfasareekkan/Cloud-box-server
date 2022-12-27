@@ -11,7 +11,7 @@ const verifyJWT = (req: Request, res: Response, next: NewableFunction) => {
         console.log(token)
         jwt.verify(
             token,
-            // JWT_SECRET,
+            process.env.JWTKEY,
             (err, decoded) => {
                 if (err) return res.sendStatus(403); //invalid token
                 // req.body.user = decoded.UserInfo.username;

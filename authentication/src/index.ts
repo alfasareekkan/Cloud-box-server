@@ -22,7 +22,6 @@ app.use(cors({
         
         
         app.use("/", authRoute);
-        // app.use("/refresh", refresh);
       mongoose.connect(process.env.DATABASE).then(() => {
           app.listen(4000, () => {
             console.log('listening on port 4000');

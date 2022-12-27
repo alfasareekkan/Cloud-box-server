@@ -35,7 +35,7 @@ export const googleSignUp = async (req: Request, res: Response) => {
             password: hashPassword
             
         })
-        const token = createToken(result)
+        const token = createToken(result,'15s')
         console.log(token,"😒😒");
         
         res.status(201).json({ user: result, accessToken:token });
@@ -43,7 +43,7 @@ export const googleSignUp = async (req: Request, res: Response) => {
         if (user) {
             const match = compare(password, user.password)
             if (match) {
-                const token = createToken(user)
+                const token = createToken(user,'15s')
              console.log(token);
                 
                 res.status(201).json({ user:user, accessToken:token})

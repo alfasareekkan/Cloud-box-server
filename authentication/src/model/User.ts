@@ -14,7 +14,9 @@ export interface IUser {
 }
 
 interface UserModel extends Model<IUser> {
-    login(email:string,password:string): IUser;
+    login(email: string, password: string): IUser;
+    findOneUser(email: string): IUser;
+    
   }
 const userSchema = new Schema<IUser,UserModel>({
     firstName: {
@@ -60,6 +62,10 @@ userSchema.static('login',async function login(email, password) {
         
     }
     throw Error('incorrect email')
- })
+})
+userSchema.static('findOneUser', async function findOneUser(email) {
+    const user = await this.findOne({ email })
+    return user
+})
 const User = model<IUser,UserModel>('User', userSchema);
 export default User;

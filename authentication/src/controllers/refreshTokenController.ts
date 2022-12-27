@@ -1,10 +1,48 @@
-import { Request, Response } from 'express'
-import jwt from 'jsonwebtoken'
+import { Request, Response, json } from 'express'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import User, { IUser } from '../model/User';
+import { createToken } from './authController';
 
 
 
 export const handleRefreshToken = async (req: Request, res: Response) => {
+    
+    const authHeader = req.headers.authorization || req.headers.Authorization;
+    try {
+        
+         if(!authHeader) throw new Error
+    if (typeof authHeader === 'string') {
+        if (!authHeader?.startsWith('Bearer ')) return res.sendStatus(403);
+        const token = authHeader.split(' ')[1]; 
+        jwt.verify(
+            token,
+            process.env.JWTKEY,
+            async (err, decoded) => {
+                if (err) return res.sendStatus(403);
+                let userToken 
+                if (typeof decoded === 'string') {
+                    
+                    userToken=JSON.parse(decoded)
+                } else {
+                    userToken=decoded
+                }
+            
+                
+                const user =await User.findOneUser(userToken.UserInfo.username)
+                
+                if (!user) return res.sendStatus(403);
+                const refreshToken = createToken(user, '15s')
+                console.log(refreshToken,"😒😒");
+                
+                res.status(200).json({refreshToken})
+                
+            }
+        );
+    }
+} catch (error) {
+    res.sendStatus(403);
+    
+}
     
  }
     
