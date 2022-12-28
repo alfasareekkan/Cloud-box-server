@@ -32,7 +32,6 @@ export const handleRefreshToken = async (req: Request, res: Response) => {
                 
                 if (!user) return res.sendStatus(403);
                 const refreshToken = createToken(user, '15s')
-                console.log(refreshToken,"😒😒");
                 
                 res.status(200).json({refreshToken})
                 
