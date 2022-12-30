@@ -16,6 +16,7 @@
     "@types/mongoose": "^5.11.97",
     "amqplib": "^0.10.3",
     "aws-sdk": "^2.1284.0",
+    "cloudinary": "^1.33.0",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -23,11 +24,13 @@
     "mongoose": "^6.8.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.20",
+    "pdf-image": "^2.0.0",
     "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {
     "@types/morgan": "^1.9.3",
     "@types/node": "^18.11.18",
+    "@types/pdf-image": "^2.0.1",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "eslint": "^8.29.0",
     "eslint-config-standard-with-typescript": "^23.0.0",

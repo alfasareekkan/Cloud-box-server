@@ -3,6 +3,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import Folder, { IFolder } from "../model/Folder";
 import mongoose, { Schema, Types } from "mongoose";
 
+
 const jwtDecode = (token: string): Types.ObjectId => {
   let userInfo: JwtPayload | string = jwt.decode(token);
   if (typeof userInfo !== "string") {
