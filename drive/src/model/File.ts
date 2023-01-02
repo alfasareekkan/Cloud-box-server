@@ -1,7 +1,7 @@
 import { Schema, model, Types } from "mongoose";
 
 export interface IFile{
-    filename: string;
+    fileName: string;
     fileType: string;
     parentFolderId?: Types.ObjectId;
     userId: Types.ObjectId;
@@ -13,11 +13,12 @@ export interface IFile{
     AWSLocation: string;
     AWSKey: string;
     AWSBucket: string;
+    cludinaryUrl: string;
 
 }
 
 const fileSchema = new Schema<IFile>({
-    filename: { type: String, required: true },
+    fileName: { type: String, required: true },
     fileType: { type: String, required: true },
     parentFolderId: {
         type: Schema.Types.ObjectId,
@@ -38,7 +39,6 @@ const fileSchema = new Schema<IFile>({
     fileHash: {
         type: String,
         required: true,
-        unique: true,
     },
     fileSize: {
         type: Number,
@@ -56,6 +56,9 @@ const fileSchema = new Schema<IFile>({
     AWSBucket: {
         type: String,
     },
+    cludinaryUrl: {
+        type: String,  
+    }
 }, { timestamps: true })
 
 const File = model<IFile>('file', fileSchema);
