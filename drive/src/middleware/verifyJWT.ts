@@ -11,14 +11,14 @@ const verifyJWT = (req: Request, res: Response, next: NextFunction) => {
     jwt.verify(token, process.env.JWTKEY, (err, decoded) => {
       if (err) return res.sendStatus(403); //invalid token
       // req.body.user = decoded.UserInfo.username;
-      console.log(decoded);
+
       let userInfo: JwtPayload | string = jwt.decode(token);
       if (typeof userInfo !== "string") {
         let id = userInfo.UserInfo.id;
-        req.body.userId=id;
+        req.headers.userId=id;
       } else {
         let userObject = JSON.parse(userInfo);
-        req.body.userId= userObject.UserInfo.id;
+        req.headers.userId= userObject.UserInfo.id;
       }
       next();
     });

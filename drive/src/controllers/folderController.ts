@@ -58,14 +58,13 @@ export const isGetFolder = async (req: Request, res: Response) => {
 
 export const getAllFolders = async (req: Request, res: Response) => {
   const { user, level, folderId } = req.body;
-  console.log(folderId);
 
   try {
     let userId = jwtDecode(user);
     if (!folderId && level === 1) {
       let folders = await Folder.find({ userId: userId, folderLevel: 1 });
       let files = await File.find({ userId, folderLevel: level, recordStatus: 0 })
-      console.log(files);
+
       
 
       res.status(200).json({ folders ,files});
@@ -77,7 +76,7 @@ export const getAllFolders = async (req: Request, res: Response) => {
       });
       console.log(folders);
       let files = await File.find({ userId, parentFolderId: folderId, recordStatus: 0 })
-      console.log(files);
+
       
 
       res.status(200).json({ folders ,files});

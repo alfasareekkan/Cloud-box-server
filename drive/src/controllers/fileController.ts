@@ -1,64 +1,71 @@
 import { Request, Response } from "express";
-import crypto,{ createHash } from "crypto"
-import {PDFImage} from 'pdf-image'
+import crypto, { createHash } from "crypto";
+import {Types} from "mongoose";
 import { uploadFile } from "../utils/awsS3Bucket";
 import Folder from "./../model/Folder"
 import File from "./../model/File";
 import cloudinary from "../utils/cloudinary";
 
 export const isFileUpload = async (req: Request, res: Response) => {
-    const { fileContents, previewImage,fileHash,userId ,folderId,level,fileName,fileSize,
+    const {
+        // fileContents,
+        previewImage,
+        // fileHash,
+        enc,
+        folderId, level, fileName, fileSize,
         fileType,} = req.body;
-
+const userId=req.headers.userId
     console.log(userId,'💕💕',"😒😒",folderId,"🐉🐉",level);
     
     try {
-        const uni8Array: Array<number> = Object.values(fileContents)
-        const buffer = Buffer.from(uni8Array);
-        const hash = createHash('sha256');
-        hash.update(buffer)
-        const fileHash2 = hash.digest('hex');
-        if (fileHash2 === fileHash) {
-            console.log(fileHash2);
+console.log(enc);
+
+        // const uni8Array: Array<number> = Object.values(fileContents)
+        // const buffer = Buffer.from(uni8Array);
+        // const hash = createHash('sha256');
+        // // hash.update(buffer)
+        // const fileHash2 = hash.digest('hex');
+        // if (fileHash2 === fileHash) {
+        //     console.log(fileHash2);
             
-            let isFileExist = await File.findOne({ userId, parentFolderId: folderId, fileName,folderLevel:level })
-            console.log(isFileExist);
+        //     let isFileExist = await File.findOne({ userId, parentFolderId: folderId, fileName,folderLevel:level })
+        //     console.log(isFileExist);
             
-            if (isFileExist) res.sendStatus(409)
+        //     if (isFileExist) res.sendStatus(409)
             
-              let previewImageData=await  cloudinary.uploader.upload(previewImage, 
-                    { 
-                        folder: "PreviewImages",
-                        width: 150,
-                        crop: "scale",
-                    },
-            )
-            console.log(previewImageData);
+        //       let previewImageData=await  cloudinary.uploader.upload(previewImage, 
+        //             { 
+        //                 folder: "PreviewImages",
+        //                 width: 150,
+        //                 crop: "scale",
+        //             },
+        //     )
+    
             
-            let s3Result = await uploadFile(buffer, req.body.fileName)
-            console.log(s3Result);
+        //     let s3Result = await uploadFile(buffer, req.body.fileName)
             
-          let file= await File.create({
-              userId,
-              parentFolderId: folderId,
-              fileName,
-              folderLevel: level,
-              fileSize,
-              fileType,
-              fileHash: fileHash2,
-              cludinaryUrl: previewImageData.secure_url,
-              AWSBucket: s3Result.Bucket,
-              AWSKey: s3Result.Key,
-              AWSEtag: s3Result.ETag,
-              AWSLocation:s3Result.Location
+            
+        //   let file= await File.create({
+        //       userId,
+        //       parentFolderId: folderId,
+        //       fileName,
+        //       folderLevel: level,
+        //       fileSize,
+        //       fileType,
+        //       fileHash: fileHash2,
+        //       cludinaryUrl: previewImageData.secure_url,
+        //       AWSBucket: s3Result.Bucket,
+        //       AWSKey: s3Result.Key,
+        //       AWSEtag: s3Result.ETag,
+        //       AWSLocation:s3Result.Location
               
-          })
-            res.status(200).json(file);
+        //   })
+        //     res.status(200).json(file);
             
 
-        } else {
-            res.sendStatus(406)
-         }
+        // } else {
+        //     res.sendStatus(406)
+        //  }
         
     // const previewBuffer = Buffer.from(previewImage)
 
@@ -84,4 +91,32 @@ export const isFileUpload = async (req: Request, res: Response) => {
 
     
     
+}
+
+export const getFileSize = async (req: Request, res: Response) => {
+    let userId = req.headers.userId;
+    if(typeof userId === 'string')
+try {
+    let fileSize=await File.aggregate([{
+        $match: {
+         userId:new Types.ObjectId(userId),
+         recordStatus: {
+          $lte: 2
+         }
+        }
+       }, {
+        $group: {
+         _id: null,
+         fileSize: {
+          $sum: '$fileSize'
+         }
+        }
+        }])
+  res.status(200).json({fileSize:fileSize[0].fileSize})
+  
+} catch (error) {
+    console.log(error);
+    
+}
+ 
 }
