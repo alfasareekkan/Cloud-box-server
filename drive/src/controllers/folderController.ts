@@ -3,6 +3,8 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import Folder, { IFolder } from "../model/Folder";
 import File from "../model/File";
 import mongoose, { Schema, Types } from "mongoose";
+import User from "../model/User";
+import Share from "../model/Share";
 
 
 const jwtDecode = (token: string): Types.ObjectId => {
@@ -83,3 +85,30 @@ export const getAllFolders = async (req: Request, res: Response) => {
     }
   } catch (error) {}
 };
+
+export const isUserShareFolder = async (req: Request, res: Response) => {
+  
+  try {
+    const user = await User.findOne({ email: req.body.email })
+  console.log(user);
+    if (!user) return res.sendStatus(404)
+    const userShare = await Share.findOne({ userId: user._id })
+    if (!userShare) {
+      let shareArray=[req.body.folderId]
+      let share = await Share.create({ userId: user._id, shares: shareArray })
+      console.log(share);
+      
+    } else {
+      userShare.shares.push(req.body.folderId);
+      let er = await userShare.save()
+      
+      res.status(200).json("success")
+      
+    }
+  } catch (error) {
+    
+  }
+  
+  
+  
+}
