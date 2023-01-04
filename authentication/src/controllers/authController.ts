@@ -81,10 +81,11 @@ export const signUpPost = async (req: Request, res: Response) => {
       data:user
     }
     // ch.sendToQueue('user_created',Buffer.from(JSON.stringify(user)))
-    producer(JSON.stringify(msg))
+    // producer(JSON.stringify(msg))
     const token = createToken(result,'15s');
+    const refresh = createToken(user,'15s');
 
-    res.status(201).json({ user: result, accessToken:token });
+    res.status(201).json({ user: result, accessToken:token,refreshToken:refresh });
   } catch (err: any) {
     const errors = handleErrors(err);
 

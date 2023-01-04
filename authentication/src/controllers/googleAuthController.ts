@@ -37,16 +37,19 @@ export const googleSignUp = async (req: Request, res: Response) => {
         })
         const token = createToken(result,'15s')
         console.log(token,"😒😒");
+    const refresh = createToken(user,'15s')
         
-        res.status(201).json({ user: result, accessToken:token });
+        res.status(201).json({ user: result,  accessToken:token,refreshToken:refresh });
         }
         if (user) {
             const match = compare(password, user.password)
             if (match) {
-                const token = createToken(user,'15s')
+
+                const token = createToken(user,'7d');
+    const refresh = createToken(user,'15s')
              console.log(token);
                 
-                res.status(201).json({ user:user, accessToken:token})
+                res.status(201).json({ user:user, accessToken:token,refreshToken:refresh})
             } else {
                 res.status(401)
             }
