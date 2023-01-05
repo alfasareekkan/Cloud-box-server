@@ -50,7 +50,7 @@ const userSchema = new Schema<IUser,UserModel>({
     //     // validate:[validator.isMobilePhone('enter a valid number')] 
     // }
 })
-
+  
 userSchema.static('login',async function login(email, password) {
     const user = await this.findOne({ email })
     if (user) {
