@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import crypto, { createHash } from "crypto";
 import {Types} from "mongoose";
-import { uploadFile } from "../utils/awsS3Bucket";
+import { uploadFile, getFile } from "../utils/awsS3Bucket";
 import Folder from "./../model/Folder"
 import File from "./../model/File";
 import cloudinary from "../utils/cloudinary";
@@ -23,7 +23,9 @@ const userId=req.headers.userId
         const uni8Array: Array<number> = Object.values(fileContents)
         const buffer = Buffer.from(uni8Array);
         const hash = createHash('sha256');
-        // hash.update(buffer)
+        hash.update(buffer)
+        console.log(buffer);
+        
         const fileHash2 = hash.digest('hex');
         if (fileHash2 === fileHash) {
             console.log(fileHash2);
@@ -60,6 +62,8 @@ const userId=req.headers.userId
               AWSLocation:s3Result.Location
               
           })
+            console.log(file);
+            
             res.status(200).json(file);
             
 
@@ -118,4 +122,15 @@ try {
     
 }
  
+}
+
+export const isGetFile =async (req: Request, res: Response) => {
+    console.log(req.body);
+    try {
+        let data=await getFile(req.body.key)
+        res.json({url:data})
+    } catch (error) {
+        console.log(error);
+        
+    }
 }

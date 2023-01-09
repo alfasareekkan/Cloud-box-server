@@ -28,3 +28,22 @@ export const uploadFile = (fileStream:Buffer, fileName: string) => {
     }
     return s3.upload(uploadParams).promise()
 }
+
+export const getFile = async (key:string) => {
+    const getParams = {
+        Bucket: bucketName,
+        Key: key,
+        // Expires:60,
+        
+    }
+    // const data = await s3.getSignedUrl('getObject',getParams)
+    const data = await s3.getSignedUrl('getObject', getParams)
+
+    console.log(data);
+    
+    // const url = data.Body.toString('utf-8');
+    // console.log(url);
+    
+    return data;
+
+}
