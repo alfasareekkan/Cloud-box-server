@@ -103,7 +103,7 @@ try {
   res.status(200).json({fileSize:fileSize[0].fileSize})
   
 } catch (error) {
-    console.log(error);
+   
     
 }
  
@@ -121,8 +121,6 @@ export const isGetFile =async (req: Request, res: Response) => {
 
 export const iGetSharedWithMe =async (req:Request, res:Response) => {
     let userId = req.headers.userId;
-    console.log(userId);
-    
     if (typeof userId === 'string')
         try {
             let result= await Share.aggregate([
@@ -157,4 +155,22 @@ export const iGetSharedWithMe =async (req:Request, res:Response) => {
         } catch (error) {
             res.sendStatus(404)
         }
+}
+
+export const getAllFiles = async(req: Request, res: Response) => {
+    let userId = req.headers.userId;
+    if (typeof userId === 'string')
+    try {
+        const result = await File.aggregate([{
+            $match: {
+             userId:new Types.ObjectId(userId),
+             recordStatus: {
+              $lte: 2
+             }
+            }
+        }])
+        res.status(200).json(result)
+    } catch (error) {
+        res.sendStatus(404)                
+    }
 }
