@@ -3,6 +3,7 @@ import crypto, { createHash } from "crypto";
 import {Types} from "mongoose";
 import { uploadFile, getFile } from "../utils/awsS3Bucket";
 import Folder from "./../model/Folder"
+import Share from "../model/Share";
 import File from "./../model/File";
 import cloudinary from "../utils/cloudinary";
 
@@ -15,7 +16,6 @@ export const isFileUpload = async (req: Request, res: Response) => {
         folderId, level, fileName, fileSize,
         fileType,} = req.body;
 const userId=req.headers.userId
-    console.log(userId,'💕💕',"😒😒",folderId,"🐉🐉",level);
     
     try {
 // console.log(enc);
@@ -70,22 +70,7 @@ const userId=req.headers.userId
         } else {
             res.sendStatus(406)
          }
-        
-    // const previewBuffer = Buffer.from(previewImage)
-
-      
-
-    //     console.log(previewBuffer);
-        
-    //     const a = buffer.toString()
-        
-
-        
-        
-  
-    
      
-        
 
     } catch (error) {
         console.log(error); 
@@ -125,12 +110,51 @@ try {
 }
 
 export const isGetFile =async (req: Request, res: Response) => {
-    console.log(req.body);
     try {
-        let data=await getFile(req.body.key)
+        let data = await getFile(req.body.key)
         res.json({url:data})
     } catch (error) {
         console.log(error);
         
     }
+}
+
+export const iGetSharedWithMe =async (req:Request, res:Response) => {
+    let userId = req.headers.userId;
+    console.log(userId);
+    
+    if (typeof userId === 'string')
+        try {
+            let result= await Share.aggregate([
+                {
+                  '$match': {
+                    'userId': new Types.ObjectId(userId)
+                  }
+                }, {
+                  '$lookup': {
+                    'from': 'files', 
+                    'localField': 'shares', 
+                    'foreignField': '_id', 
+                    'as': 'res'
+                  }
+                }, {
+                  '$project': {
+                    'res': 1, 
+                    '_id': 0
+                  }
+                }, {
+                  '$unwind': {
+                    'path': '$res'
+                  }
+                }, {
+                  '$replaceRoot': {
+                    'newRoot': '$res'
+                  }
+                }
+            ])
+            res.status(200).json(result)
+            
+        } catch (error) {
+            res.sendStatus(404)
+        }
 }
