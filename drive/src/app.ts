@@ -27,13 +27,15 @@ const port = process.env.PORT;
 app.use(verifyJWT)
 app.use('/', folderRouter);
 app.use('/files', fileRouter);
-consumer();
-mongoose.connect(process.env.DATABASE).then(() => {
+// consumer();
+mongoose.connect(process.env.DATABASE, {
+  // strictQuery:false,
+}).then(() => {
   app.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);
   });
 });
-process.on('beforeExit', () => {
-  console.log('closing connection');
-  amqbConnection.close()
-})
+// process.on('beforeExit', () => {
+//   console.log('closing connection');
+//   amqbConnection.close()
+// })
