@@ -11,10 +11,10 @@ import User from "./model/User";
 import createMQConsumer, { amqbConnection } from "./utils/consummer";
 
 dotenv.config();
-export const consumer = createMQConsumer(
-  process.env.RABITMQURI,
-  process.env.RABITQUEUE
-);
+// export const consumer = createMQConsumer(
+//   process.env.RABITMQURI,
+//   process.env.RABITQUEUE
+// );
 const app = express();
 app.use(cors({
   credentials: true,
@@ -30,6 +30,7 @@ app.use('/files', fileRouter);
 // consumer();
 mongoose.connect(process.env.DATABASE, {
   // strictQuery:false,
+  // useNewUrlParser: true
 }).then(() => {
   app.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);
