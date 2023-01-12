@@ -22,7 +22,9 @@ export const isCreateFolder = async (req: Request, res: Response) => {
   const { userId, folderName, folderId, level } = req.body;
 
   try {
-    let user = jwtDecode(req.body.userId);
+    let user = req.headers.userId
+    console.log(user);
+    
     if (level === 1) {
 
       let folder = await Folder.create({
