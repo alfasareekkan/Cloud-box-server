@@ -9,6 +9,8 @@ export interface IUser {
     lastName: string;
     email: string;
     password: string;
+    otp?: string;
+    otpVerify?: boolean;
     profile?:string
     // phoneNumber: number;
 }
@@ -42,6 +44,13 @@ const userSchema = new Schema<IUser,UserModel>({
     },
     profile: {
         type:String
+    },
+    otp: {
+        type:String,
+    },
+    otpVerify: {
+        type: Boolean,
+        default:false
     }
 
     // phoneNumber: {
