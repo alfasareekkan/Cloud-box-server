@@ -7,7 +7,6 @@ export interface IFile{
     userId: Types.ObjectId;
     recordStatus: number;
     folderLevel: number;
-    fileHash: string;
     fileSize: number;
     AWSEtag: string;
     AWSLocation: string;
@@ -35,10 +34,6 @@ const fileSchema = new Schema<IFile>({
     folderLevel: {
         type: Number,
         default:0,
-    },
-    fileHash: {
-        type: String,
-        required: true,
     },
     fileSize: {
         type: Number,

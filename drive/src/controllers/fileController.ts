@@ -11,28 +11,25 @@ export const isFileUpload = async (req: Request, res: Response) => {
     const {
         fileContents,
         previewImage,
-        fileHash,
         // enc,
         folderId, level, fileName, fileSize,
         fileType,} = req.body;
-const userId=req.headers.userId
+     const userId=req.headers.userId
     
     try {
 // console.log(enc);
 
-        const uni8Array: Array<number> = Object.values(fileContents)
-        const buffer = Buffer.from(uni8Array);
-        const hash = createHash('sha256');
-        hash.update(buffer)
-        console.log(buffer);
+        // const uni8Array: Array<number> = Object.values(fileContents)
+        // const buffer = Buffer.from(uni8Array);
+        // const hash = createHash('sha256');
+        // hash.update(buffer)
+        // console.log(buffer);
         
-        const fileHash2 = hash.digest('hex');
-        if (fileHash2 === fileHash) {
-            console.log(fileHash2);
+        // const fileHash2 = hash.digest('hex');
+        // if (fileHash2 === fileHash) {
+            // console.log(fileHash2);
             
             let isFileExist = await File.findOne({ userId, parentFolderId: folderId, fileName,folderLevel:level })
-            console.log(isFileExist);
-            
             if (isFileExist) res.sendStatus(409)
             
               let previewImageData=await  cloudinary.uploader.upload(previewImage, 
@@ -44,7 +41,7 @@ const userId=req.headers.userId
             )
     
             
-            let s3Result = await uploadFile(buffer, req.body.fileName)
+            // let s3Result = await uploadFile(buffer, req.body.fileName)
             
             
           let file= await File.create({
@@ -54,12 +51,12 @@ const userId=req.headers.userId
               folderLevel: level,
               fileSize,
               fileType,
-              fileHash: fileHash2,
+              // fileHash: fileHash2,
               cludinaryUrl: previewImageData.secure_url,
-              AWSBucket: s3Result.Bucket,
-              AWSKey: s3Result.Key,
-              AWSEtag: s3Result.ETag,
-              AWSLocation:s3Result.Location
+              AWSBucket: fileContents.Bucket,
+              AWSKey: fileContents.Key,
+              AWSEtag: fileContents.ETag,
+              AWSLocation:fileContents.Location
               
           })
             console.log(file);
@@ -67,9 +64,10 @@ const userId=req.headers.userId
             res.status(200).json(file);
             
 
-        } else {
-            res.sendStatus(406)
-         }
+  // } 
+        // else {
+        //     res.sendStatus(406)
+        //  }
      
 
     } catch (error) {
