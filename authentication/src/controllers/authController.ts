@@ -12,7 +12,6 @@ dotenv.config();
 const JWTKEY: string | undefined = process.env.JWTKEY;
 
 export const handleErrors = (err: any) => {
-  console.log(err.message);
   // err.code is for duplicate exists
   interface errorType {
     email: string, password: string,
@@ -26,7 +25,6 @@ export const handleErrors = (err: any) => {
   if (err.message.includes("User validation failed")) {
     // to take values only form object
     Object.values(err.errors).forEach(({ properties }: any) => {
-      console.log(properties,'😒😒');
       
       error[properties.path]= properties.message;
     });
@@ -90,7 +88,8 @@ export const signUpPost = async (req: Request, res: Response) => {
         firstName: result.firstName,
         lastName: result.lastName,
         email: result.email,
-        profile:result.profile
+        profile: result.profile,
+        otpVerify: result.otpVerify,
     }, accessToken:token,refreshToken:refresh });
   } catch (err: any) {
     const errors = handleErrors(err);
@@ -110,7 +109,8 @@ export const loginPost = async (req: Request, res: Response) => {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        profile:user.profile
+        profile: user.profile,
+        otpVerify:user.otpVerify,
     },accessToken:token,refreshToken:refresh})
   } catch (error) {
     const errors = handleErrors(error);

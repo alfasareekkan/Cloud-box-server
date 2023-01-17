@@ -42,7 +42,8 @@ export const googleSignUp = async (req: Request, res: Response) => {
             firstName: result.firstName,
             lastName: result.lastName,
             email: result.email,
-            profile:result.profile
+            profile: result.profile,
+            otpVerify: result.otpVerify,
         },  accessToken:token,refreshToken:refresh });
         }
         if (user) {
@@ -56,7 +57,8 @@ export const googleSignUp = async (req: Request, res: Response) => {
                     firstName: user.firstName,
                     lastName: user.lastName,
                     email: user.email,
-                    profile:user.profile
+                    profile: user.profile,
+                    otpVerify:user.otpVerify
                 }, accessToken:token,refreshToken:refresh})
             } else {
                 res.status(401)
