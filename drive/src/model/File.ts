@@ -13,6 +13,7 @@ export interface IFile{
     AWSKey: string;
     AWSBucket: string;
     cludinaryUrl: string;
+    favourite: boolean;
 
 }
 
@@ -53,6 +54,10 @@ const fileSchema = new Schema<IFile>({
     },
     cludinaryUrl: {
         type: String,  
+    },
+    favourite: {
+        type: Boolean,
+        default:false,
     }
 }, { timestamps: true })
 

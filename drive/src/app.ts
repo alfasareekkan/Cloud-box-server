@@ -6,6 +6,7 @@ import morgan from "morgan";
 import verifyJWT from "./middleware/verifyJWT";
 import folderRouter from "./routes/folderRoute";
 import fileRouter from "./routes/fileRoutes"
+import trashRouter from "./routes/trashRoutes"
 import amqp, { Channel } from "amqplib/callback_api";
 import User from "./model/User";
 import createMQConsumer, { amqbConnection } from "./utils/consummer";
@@ -27,6 +28,7 @@ const port = process.env.PORT;
 app.use(verifyJWT)
 app.use('/', folderRouter);
 app.use('/files', fileRouter);
+app.use('/trash',trashRouter)
 // consumer();
 mongoose.connect(process.env.DATABASE, {
   // strictQuery:false,

@@ -172,3 +172,49 @@ export const getAllFiles = async(req: Request, res: Response) => {
         res.sendStatus(404)                
     }
 }
+
+export const deleteFile = async(req: Request, res: Response) => {
+  const userId = req.headers.userId;
+  const fileId = req.params.id;
+  try {
+    const file = await File.findOne({ userId, _id: fileId });
+    if (!file) throw new Error("server error");
+    file.recordStatus = 3;
+    await file.save();
+    res.status(200).json("success");
+  } catch (error:any) {
+    
+  res.status(404).json({message:error.message})
+  }
+  
+}
+
+
+export const addToFavorite = async(req: Request, res: Response) => { 
+  const userId = req.headers.userId;
+  const fileId = req.params.id;
+  try {
+    const file = await File.updateOne({ userId, _id: fileId }, {
+      $set: {
+      favourite:true
+      }
+    });
+    if (file.modifiedCount === 0) throw new Error("server error");
+    res.status(200).json("success");
+    
+  } catch (error:any) {
+    res.status(404).json({ message:error.message})
+  }
+}
+
+export const isGetFavorite =async (req: Request, res: Response) => {
+  const userId = req.headers.userId;
+
+  try {
+    const files = await File.find({ userId, favourite: true });
+    res.status(200).json(files);
+  } catch (error:any) {
+    res.status(404).json({ message:error.message})
+
+  }
+}
